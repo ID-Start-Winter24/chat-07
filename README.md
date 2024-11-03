@@ -1,3 +1,5 @@
 # chat-07
 
 # StyleMate
+
+In einer Zeit in der Fast-Fashion-Brands bewusst oder unbewusst in jedermanns Kleiderschränken vertreten sind, bedarf es einer Aussortierung und Umstellung, die bereits von vielen zwar angestrebt wird, jedoch bezüglich seiner Umsetzung noch von Unklarheiten geprägt ist. Ein Chatbot mit der Berücksichtigung individueller Mode-Geschmäcker, Körperproportionen, Vergleichsmöglichkeiten bester Qualität und Preise, sowie der Anzeige von Alternativen zu ungesunden Materialien und Kinderarbeit soll diese Unsicherheiten nun übersichtlich aus dem Weg schaffen und die dunkle Wolke, die über den Kleiderschränken schwebt endgültig beseitigen
