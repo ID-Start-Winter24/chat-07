@@ -26,7 +26,7 @@ template = (
     "---------------------\n"
     "{context_str}"
     "\n---------------------\n"
-    "Given only this information and without using ur general knowledge, please answer the question in the style of Shakespeare and always answer in german: {query_str}\n"
+    "Given only this information and without using ur general knowledge, please answer in the style of Karl Lagefeld: {query_str}\n"
 )
 qa_template = PromptTemplate(template)
 query_engine = index.as_query_engine(
@@ -46,31 +46,55 @@ def response(message, history):
 theme = CustomTheme()
 
 
+# def main():
+#     chatbot = gr.Chatbot(
+#         value=[{"role": "assistant", "content": "How can I help you today?"}],
+#         type="messages",
+#         show_label=False,
+#         avatar_images=("./avatar_images/human.png",
+#                        "./avatar_images/robot.png"),
+#         elem_id="CHATBOT"
+#     )
+
+#     with gr.Blocks() as demo:
+#         with gr.Row():
+#             with gr.Column():
+#                 textbox1 = gr.Textbox()
+#                 textbox2 = gr.Textbox()
+#             with gr.Column():
+#                 chatinterface = gr.ChatInterface(
+#                     fn=response,
+#                     chatbot=chatbot,
+#                     type="messages",
+#                     theme=theme,
+#                     css_paths="./styles.css"
+#                 )
+
+#     demo.launch(inbrowser=True)
+
+
+# if __name__ == "__main__":
+#     main()
+
 def main():
     chatbot = gr.Chatbot(
         value=[{"role": "assistant", "content": "How can I help you today?"}],
         type="messages",
         show_label=False,
-        avatar_images=("./avatar_images/human.png",
-                       "./avatar_images/robot.png"),
+        avatar_images=("./avatar_images/stylemate_chatbot.jpg",
+                       "./avatar_images/stylemate_chatbot.jpg"),
         elem_id="CHATBOT"
     )
 
-    with gr.Blocks() as demo:
-        with gr.Row():
-            with gr.Column():
-                textbox1 = gr.Textbox()
-                textbox2 = gr.Textbox()
-            with gr.Column():
-                chatinterface = gr.ChatInterface(
-                    fn=response,
-                    chatbot=chatbot,
-                    type="messages",
-                    theme=theme,
-                    css_paths="./styles.css"
-                )
+    chatinterface = gr.ChatInterface(
+        fn=response,
+        chatbot=chatbot,
+        type="messages",
+        theme=theme,
+        css_paths="./styles.css"
+    )
 
-    demo.launch(inbrowser=True)
+    chatinterface.launch(inbrowser=True)
 
 
 if __name__ == "__main__":
