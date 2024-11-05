@@ -1,7 +1,6 @@
 import os
 import time
 import gradio as gr
-
 from llama_index.core import VectorStoreIndex, SimpleDirectoryReader, StorageContext, load_index_from_storage, PromptTemplate
 from llama_index.llms.openai import OpenAI
 from llama_index.core import Settings
@@ -57,15 +56,21 @@ def main():
         elem_id="CHATBOT"
     )
 
-    chatinterface = gr.ChatInterface(
-        fn=response,
-        chatbot=chatbot,
-        type="messages",
-        theme=theme,
-        css_paths="./style.css"
-    )
+    with gr.Blocks() as demo:
+        with gr.Row():
+            with gr.Column():
+                textbox1 = gr.Textbox()
+                textbox2 = gr.Textbox()
+            with gr.Column():
+                chatinterface = gr.ChatInterface(
+                    fn=response,
+                    chatbot=chatbot,
+                    type="messages",
+                    theme=theme,
+                    css_paths="./styles.css"
+                )
 
-    chatinterface.launch(inbrowser=True)
+    demo.launch(inbrowser=True)
 
 
 if __name__ == "__main__":
