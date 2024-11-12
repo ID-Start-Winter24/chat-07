@@ -8,13 +8,13 @@ from llama_index.core import Settings
 from theme import CustomTheme
 
 
-path_modulhandbuch = "./modulhandbuch"
+path_modulhandbuch = "./dokumente"
 path_persist = os.path.join(path_modulhandbuch, "persist")
 
 Settings.llm = OpenAI(temperature=0.1, model="gpt-4o-mini")
 
 if not os.path.exists(path_persist):
-    documents = SimpleDirectoryReader("./modulhandbuch/").load_data()
+    documents = SimpleDirectoryReader("./dokumente/").load_data()
     index = VectorStoreIndex.from_documents(documents)
     index.storage_context.persist(persist_dir=path_persist)
 else:
@@ -26,7 +26,7 @@ template = (
     "---------------------\n"
     "{context_str}"
     "\n---------------------\n"
-    "Given only this information and without using ur general knowledge, please answer in the style of Karl Lagefeld: {query_str}\n"
+    "Given only this information and without using ur general knowledge, please answer always in german: {query_str}\n"
 )
 qa_template = PromptTemplate(template)
 query_engine = index.as_query_engine(
