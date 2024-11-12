@@ -1,2 +1,4 @@
 dokumente/persist/
 __pycache__/
+.DS_Store
+dokumente/.DS_Store
