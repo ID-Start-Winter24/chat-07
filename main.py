@@ -85,7 +85,8 @@ theme = CustomTheme()
 
 def main():
     chatbot = gr.Chatbot(
-        value=[{"role": "assistant", "content": "How can I help you today?"}],
+        value=[{"role": "assistant",
+                "content": "Hey! Was steht heute an? Brauchst du Outfit-Ideen oder Styling-Tipps?"}],
         type="messages",
         show_label=False,
         avatar_images=("./avatar_images/stylemate_chatbot.jpg",
