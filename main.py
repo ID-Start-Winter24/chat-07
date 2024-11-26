@@ -26,7 +26,7 @@ template = (
     "---------------------\n"
     "{context_str}"
     "\n---------------------\n"
-    "Given only this information and without using ur general knowledge, please answer always in german: {query_str}\n"
+    "Given only this information and without using ur general knowledge, please answer in german and address with 'du': {query_str}\n"
 )
 qa_template = PromptTemplate(template)
 query_engine = index.as_query_engine(
@@ -34,13 +34,20 @@ query_engine = index.as_query_engine(
 
 
 def response(message, history):
-    streaming_response = query_engine.query(message)
+    # Logic to determine if the chatbot should ask follow-up questions
+    if "wear" in message.lower() or "anziehen" in message.lower():
+        # Respond with a sustainability-focused follow-up question
+        follow_up = "Was hast du bereits in deinem Kleiderschrank? Vielleicht können wir etwas kombinieren, anstatt etwas Neues zu kaufen. 😊"
+        yield follow_up
+    else:
+        # Standard response from the query engine
+        streaming_response = query_engine.query(message)
 
-    answer = ""
-    for text in streaming_response.response_gen:
-        time.sleep(0.05)
-        answer += text
-        yield answer
+        answer = ""
+        for text in streaming_response.response_gen:
+            time.sleep(0.05)
+            answer += text
+            yield answer
 
 
 theme = CustomTheme()
