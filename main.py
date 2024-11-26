@@ -34,13 +34,27 @@ query_engine = index.as_query_engine(
 
 
 def response(message, history):
-    # Logic to determine if the chatbot should ask follow-up questions
-    if "wear" in message.lower() or "anziehen" in message.lower():
-        # Respond with a sustainability-focused follow-up question
+    import random
+
+    # Keywords indicating dissatisfaction with any outfit
+    negative_outfit_phrases = ["hässlich", "ugly", "schlecht",
+                               "nicht gut", "nicht schön", "grässlich", "furchtbar", "katastrophe"]
+
+    if any(phrase in message.lower() for phrase in negative_outfit_phrases):
+        uplifting_responses = [
+            "Es tut mir leid, dass du dich gerade so fühlst. Lass uns zusammen schauen, wie wir dein Outfit aufwerten können – vielleicht mit Accessoires oder einem neuen Styling-Twist! 😊",
+            "Mode ist, wie du dich darin fühlst – nicht nur das Kleidungsstück selbst. Ich bin sicher, wir finden etwas, das dich zum Strahlen bringt! 💖",
+            "Manchmal machen kleine Details einen großen Unterschied. Vielleicht können wir dein Outfit mit einem Gürtel, einer Jacke oder Schmuck aufpeppen? Soll ich dir helfen? 🌟",
+            "Dein Stil ist einzigartig, und das ist etwas Besonderes. Wenn du magst, können wir das Outfit so anpassen, dass es sich mehr wie 'du' anfühlt!",
+            "Wir alle haben Tage, an denen wir uns unsicher fühlen. Aber dein Outfit hat Potenzial! Lass uns gemeinsam überlegen, was dir daran gefallen könnte oder wie wir es optimieren können. 💡"
+        ]
+        yield random.choice(uplifting_responses)
+    elif "anziehen" in message.lower() or "wear" in message.lower():
+        # Sustainability-focused follow-up
         follow_up = "Was hast du bereits in deinem Kleiderschrank? Vielleicht können wir etwas kombinieren, anstatt etwas Neues zu kaufen. 😊"
         yield follow_up
     else:
-        # Standard response from the query engine
+        # Standard query engine response
         streaming_response = query_engine.query(message)
 
         answer = ""
