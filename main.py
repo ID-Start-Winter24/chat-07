@@ -1,5 +1,6 @@
 import os
 import time
+import base64
 import gradio as gr
 from llama_index.core import VectorStoreIndex, SimpleDirectoryReader, StorageContext, load_index_from_storage, PromptTemplate
 from llama_index.llms.openai import OpenAI
@@ -32,6 +33,20 @@ qa_template = PromptTemplate(template)
 query_engine = index.as_query_engine(
     streaming=True, text_qa_template=qa_template)
 
+background_path = os.path.join("background", "closet.png")
+with open("background/closet.png"
+,
+"rb") as image_file:
+ encoded_string = base64.b64encode(image_file.read()).decode()
+custom_css = f"""
+.gradio-container {{
+ background: url("data:image/png;base64,{encoded_string}") !important;
+ background-size: cover !important;
+ background-position: center !important;
+ max-width: 100% !important;
+ height: auto !important;
+}}
+"""
 
 def response(message, history):
     import random
