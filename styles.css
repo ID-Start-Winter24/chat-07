@@ -1,3 +1,5 @@
+@import url("https://fonts.googleapis.com/css2?family=Hind+Madurai:wght@300;400;500;600;700&display=swap");
+
 #CHATBOT {
   background: rgba(255, 255, 255, 0.35);
   border-radius: 16px;
@@ -5,4 +7,9 @@
   backdrop-filter: blur(4.5px);
   -webkit-backdrop-filter: blur(4.5px);
   border: 1px solid rgba(255, 255, 255, 0.28);
+}
+
+.message.bot {
+  background: rgba(247, 248, 245, 0.35) !important;
+  font-family: "Hind Madurai", sans-serif;
 }
