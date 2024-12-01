@@ -34,7 +34,7 @@ query_engine = index.as_query_engine(
     streaming=True, text_qa_template=qa_template)
 
 background_path = os.path.join("background", "closet.png")
-with open("background/closet.png","rb") as image_file:
+with open("background/closet.png", "rb") as image_file:
     encoded_string = base64.b64encode(image_file.read()).decode()
 custom_css = f"""
 .gradio-container {{
@@ -45,6 +45,7 @@ custom_css = f"""
  height: auto !important;
 }}
 """
+
 
 def response(message, history):
     import random
@@ -80,48 +81,18 @@ def response(message, history):
 theme = CustomTheme()
 
 
-# def main():
-#     chatbot = gr.Chatbot(
-#         value=[{"role": "assistant", "content": "How can I help you today?"}],
-#         type="messages",
-#         show_label=False,
-#         avatar_images=("./avatar_images/human.png",
-#                        "./avatar_images/robot.png"),
-#         elem_id="CHATBOT"
-#     )
-
-#     with gr.Blocks() as demo:
-#         with gr.Row():
-#             with gr.Column():
-#                 textbox1 = gr.Textbox()
-#                 textbox2 = gr.Textbox()
-#             with gr.Column():
-#                 chatinterface = gr.ChatInterface(
-#                     fn=response,
-#                     chatbot=chatbot,
-#                     type="messages",
-#                     theme=theme,
-#                     css_paths="./styles.css"
-#                 )
-
-#     demo.launch(inbrowser=True)
-
-
-# if __name__ == "__main__":
-#     main()
-
 def main():
     chatbot = gr.Chatbot(
         value=[{"role": "assistant",
                 "content": "Hey! Was steht heute an? Brauchst du Outfit-Ideen oder Styling-Tipps?"}],
         type="messages",
         show_label=False,
-        avatar_images=("./avatar_images/stylemate_chatbot.jpg",
-                       "./avatar_images/stylemate_chatbot.jpg"),
+        avatar_images=("./avatar_images/avatar-person.jpeg",
+                       "./avatar_images/avatar-chat.png"),
         elem_id="CHATBOT"
     )
 
-    with open("background_new.jpg","rb") as image_file:
+    with open("background_new.jpg", "rb") as image_file:
         encoded_string = base64.b64encode(image_file.read()).decode()
     custom_css = f"""
     .gradio-container {{
@@ -131,7 +102,6 @@ def main():
         max-width: 100% !important;
         height: auto !important;
     }}"""
-    
 
     chatinterface = gr.ChatInterface(
         fn=response,
@@ -141,7 +111,6 @@ def main():
         css=custom_css,
         css_paths="./styles.css"
     )
-
 
     chatinterface.launch(inbrowser=True)
 

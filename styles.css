@@ -1,15 +1,39 @@
 @import url("https://fonts.googleapis.com/css2?family=Hind+Madurai:wght@300;400;500;600;700&display=swap");
 
 #CHATBOT {
-  background: rgba(255, 255, 255, 0.35);
+  background: rgba(255, 255, 255, 0.7);
   border-radius: 16px;
-  box-shadow: 0 4px 30px #426b5c;
+  box-shadow: 0 4px 30px #d6dade;
   backdrop-filter: blur(4.5px);
   -webkit-backdrop-filter: blur(4.5px);
   border: 1px solid rgba(255, 255, 255, 0.28);
 }
 
 .message.bot {
-  background: rgba(247, 248, 245, 0.35) !important;
+  background: rgba(255, 255, 255, 0.6) !important;
   font-family: "Hind Madurai", sans-serif;
+}
+
+.message.bot * {
+  color: #000000;
+}
+
+.message.user {
+  background: rgba(0, 0, 0, 0.35) !important;
+  font-family: "Hind Madurai", sans-serif;
+}
+
+.message.user * {
+  color: #ffffff !important;
+}
+
+.avatar-container img {
+  padding: 0 !important;
+}
+
+input,
+textarea {
+  border: 2px solid #000000 !important; /* Change border color to black */
+  border-radius: 50px; /* Optional: Add rounded corners */
+  background-color: #e8e9ea !important; /* Optional: Match background color */
 }
