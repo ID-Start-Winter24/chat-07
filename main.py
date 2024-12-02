@@ -54,6 +54,9 @@ def response(message, history):
     negative_outfit_phrases = ["hässlich", "ugly", "schlecht",
                                "nicht gut", "nicht schön", "grässlich", "furchtbar", "katastrophe"]
 
+    # Keywords indicating interest in new outfits
+    buy_new_phrases = ["neu kaufen", "buy new", "neues kaufen", "new outfit"]
+
     if any(phrase in message.lower() for phrase in negative_outfit_phrases):
         uplifting_responses = [
             "Es tut mir leid, dass du dich gerade so fühlst. Lass uns zusammen schauen, wie wir dein Outfit aufwerten können – vielleicht mit Accessoires oder einem neuen Styling-Twist! 😊",
@@ -63,10 +66,15 @@ def response(message, history):
             "Wir alle haben Tage, an denen wir uns unsicher fühlen. Aber dein Outfit hat Potenzial! Lass uns gemeinsam überlegen, was dir daran gefallen könnte oder wie wir es optimieren können. 💡"
         ]
         yield random.choice(uplifting_responses)
-    elif "anziehen" in message.lower() or "wear" in message.lower():
-        # Sustainability-focused follow-up
-        follow_up = "Was hast du bereits in deinem Kleiderschrank? Vielleicht können wir etwas kombinieren, anstatt etwas Neues zu kaufen. 😊"
+
+    elif any(keyword in message.lower() for keyword in ["anziehen", "wear", "style"]) and not any(keyword in message.lower() for keyword in ["size", "größe", "fit"]):
+        # Check if the user is explicitly asking for new items
+        if any(phrase in message.lower() for phrase in buy_new_phrases):
+            follow_up = "Suchst du etwas Bestimmtes, das wir neu kaufen könnten? Ich kann dir ein paar trendige Ideen vorschlagen! 😊"
+        else:
+            follow_up = "Was hast du bereits in deinem Kleiderschrank? Vielleicht können wir etwas kombinieren, anstatt etwas Neues zu kaufen. 😊"
         yield follow_up
+
     else:
         # Standard query engine response
         streaming_response = query_engine.query(message)
@@ -88,7 +96,7 @@ def main():
         type="messages",
         show_label=False,
         avatar_images=("./avatar_images/avatar-person.jpeg",
-                       "./avatar_images/avatar-chat.png"),
+                       "./avatar_images/avatar-bot.png"),
         elem_id="CHATBOT"
     )
 
