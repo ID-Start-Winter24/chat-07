@@ -36,4 +36,12 @@ textarea {
   border: 2px solid #000000 !important; /* Change border color to black */
   border-radius: 50px; /* Optional: Add rounded corners */
   background-color: #e8e9ea !important; /* Optional: Match background color */
+  color: #000000 !important; /* Set text color for light mode */
+}
+
+body.dark-mode input,
+body.dark-mode textarea {
+  background-color: #2c2c2c !important; /* Match dark mode input background */
+  color: #cccccc !important; /* Set text color for dark mode */
+  border: 2px solid #cccccc !important; /* Optional: Change border color for dark mode */
 }
