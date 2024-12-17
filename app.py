@@ -27,7 +27,7 @@ template = (
     "---------------------\n"
     "{context_str}"
     "\n---------------------\n"
-    "Given only this information and without using ur general knowledge, please answer in german and address with 'du': {query_str}\n"
+    "Given only this information and without using general knowledge, please answer in the appropriate language (German or English) based on the query: {query_str}\n"
 )
 qa_template = PromptTemplate(template)
 query_engine = index.as_query_engine(
@@ -55,7 +55,13 @@ def response(message, history):
                                "nicht gut", "nicht schön", "grässlich", "furchtbar", "katastrophe"]
 
     # Keywords indicating interest in new outfits
+    outfit_request_phrases = ["outfit", "empfehlung", "style", "anziehen"]
     buy_new_phrases = ["neu kaufen", "buy new", "neues kaufen", "new outfit"]
+
+    # Session flag for asking gender
+    if not hasattr(response, "awaiting_gender"):
+        response.awaiting_gender = False
+        response.last_query = ""
 
     if any(phrase in message.lower() for phrase in negative_outfit_phrases):
         uplifting_responses = [
@@ -67,13 +73,25 @@ def response(message, history):
         ]
         yield random.choice(uplifting_responses)
 
-    elif any(keyword in message.lower() for keyword in ["anziehen", "wear", "style"]) and not any(keyword in message.lower() for keyword in ["size", "größe", "fit"]):
-        # Check if the user is explicitly asking for new items
-        if any(phrase in message.lower() for phrase in buy_new_phrases):
-            follow_up = "Suchst du etwas Bestimmtes, das wir neu kaufen könnten? Ich kann dir ein paar trendige Ideen vorschlagen! 😊"
-        else:
-            follow_up = "Was hast du bereits in deinem Kleiderschrank? Vielleicht können wir etwas kombinieren, anstatt etwas Neues zu kaufen. 😊"
-        yield follow_up
+    elif any(phrase in message.lower() for phrase in outfit_request_phrases):
+        if not response.awaiting_gender:  # First time asking
+            response.awaiting_gender = True
+            response.last_query = message
+            yield "Cool! Für wen suchst du ein Outfit? Für einen Mann, eine Frau oder diverse?"
+        else:  # Gender already asked, now processing answer
+            if "mann" in message.lower():
+                gender = "Mann"
+            elif "frau" in message.lower():
+                gender = "Frau"
+            elif "divers" in message.lower():
+                gender = "divers"
+            else:
+                yield "Ich habe dich nicht ganz verstanden. Bitte sag 'Mann', 'Frau' oder 'diverse'."
+                return
+
+            # Reset flag and give a response
+            response.awaiting_gender = False
+            yield f"Alles klar! Ich suche jetzt nach tollen Outfit-Ideen für {gender}. Lass uns starten!"
 
     else:
         # Standard query engine response
