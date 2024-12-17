@@ -63,35 +63,46 @@ def response(message, history):
         response.awaiting_gender = False
         response.last_query = ""
 
+    # Detect language (simple check for English or German based on keywords)
+    is_english = any(word in message.lower()
+                     for word in ["outfit", "wear", "style", "buy", "new", "ugly"])
+
     if any(phrase in message.lower() for phrase in negative_outfit_phrases):
-        uplifting_responses = [
+        uplifting_responses_de = [
             "Es tut mir leid, dass du dich gerade so fühlst. Lass uns zusammen schauen, wie wir dein Outfit aufwerten können – vielleicht mit Accessoires oder einem neuen Styling-Twist! 😊",
             "Mode ist, wie du dich darin fühlst – nicht nur das Kleidungsstück selbst. Ich bin sicher, wir finden etwas, das dich zum Strahlen bringt! 💖",
             "Manchmal machen kleine Details einen großen Unterschied. Vielleicht können wir dein Outfit mit einem Gürtel, einer Jacke oder Schmuck aufpeppen? Soll ich dir helfen? 🌟",
             "Dein Stil ist einzigartig, und das ist etwas Besonderes. Wenn du magst, können wir das Outfit so anpassen, dass es sich mehr wie 'du' anfühlt!",
             "Wir alle haben Tage, an denen wir uns unsicher fühlen. Aber dein Outfit hat Potenzial! Lass uns gemeinsam überlegen, was dir daran gefallen könnte oder wie wir es optimieren können. 💡"
         ]
-        yield random.choice(uplifting_responses)
+        uplifting_responses_en = [
+            "I'm sorry you're feeling this way. Let's see how we can improve your outfit – maybe with accessories or a fresh styling twist! 😊",
+            "Fashion is about how you feel in it – not just the clothing itself. I'm sure we can find something that makes you shine! 💖",
+            "Small details can make a big difference. Maybe we can enhance your outfit with a belt, a jacket, or some jewelry? Shall I help you? 🌟",
+            "Your style is unique, and that's special. If you'd like, we can adjust the outfit so it feels more like 'you'!",
+            "We all have days when we feel uncertain. But your outfit has potential! Let’s think about what you might like or how we can tweak it. 💡"
+        ]
+        yield random.choice(uplifting_responses_en if is_english else uplifting_responses_de)
 
     elif any(phrase in message.lower() for phrase in outfit_request_phrases):
         if not response.awaiting_gender:  # First time asking
             response.awaiting_gender = True
             response.last_query = message
-            yield "Cool! Für wen suchst du ein Outfit? Für einen Mann, eine Frau oder diverse?"
+            yield "Cool! For whom are you looking for an outfit? For a man, a woman, or diverse?" if is_english else "Cool! Für wen suchst du ein Outfit? Für einen Mann, eine Frau oder diverse?"
         else:  # Gender already asked, now processing answer
-            if "mann" in message.lower():
-                gender = "Mann"
-            elif "frau" in message.lower():
-                gender = "Frau"
-            elif "divers" in message.lower():
-                gender = "divers"
+            if "mann" in message.lower() or "man" in message.lower():
+                gender = "Mann" if not is_english else "man"
+            elif "frau" in message.lower() or "woman" in message.lower():
+                gender = "Frau" if not is_english else "woman"
+            elif "diverse" in message.lower():
+                gender = "diverse"
             else:
-                yield "Ich habe dich nicht ganz verstanden. Bitte sag 'Mann', 'Frau' oder 'diverse'."
+                yield "I didn’t quite understand. Please say 'man', 'woman', or 'diverse'." if is_english else "Ich habe dich nicht ganz verstanden. Bitte sag 'Mann', 'Frau' oder 'diverse'."
                 return
 
             # Reset flag and give a response
             response.awaiting_gender = False
-            yield f"Alles klar! Ich suche jetzt nach tollen Outfit-Ideen für {gender}. Lass uns starten!"
+            yield f"Got it! I'll look for great outfit ideas for {gender}. Let's get started!" if is_english else f"Alles klar! Ich suche jetzt nach tollen Outfit-Ideen für {gender}. Lass uns starten!"
 
     else:
         # Standard query engine response
