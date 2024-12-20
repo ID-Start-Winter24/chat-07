@@ -58,11 +58,6 @@ def response(message, history):
     outfit_request_phrases = ["outfit", "empfehlung", "style", "anziehen"]
     buy_new_phrases = ["neu kaufen", "buy new", "neues kaufen", "new outfit"]
 
-    # Session flag for asking gender
-    if not hasattr(response, "awaiting_gender"):
-        response.awaiting_gender = False
-        response.last_query = ""
-
     # Detect language (simple check for English or German based on keywords)
     is_english = any(word in message.lower()
                      for word in ["outfit", "wear", "style", "buy", "new", "ugly"])
