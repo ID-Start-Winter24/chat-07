@@ -84,26 +84,6 @@ def response(message, history):
         ]
         yield random.choice(uplifting_responses_en if is_english else uplifting_responses_de)
 
-    elif any(phrase in message.lower() for phrase in outfit_request_phrases):
-        if not response.awaiting_gender:  # First time asking
-            response.awaiting_gender = True
-            response.last_query = message
-            yield "Cool! For whom are you looking for an outfit? For a man, a woman, or diverse?" if is_english else "Cool! Für wen suchst du ein Outfit? Für einen Mann, eine Frau oder diverse?"
-        else:  # Gender already asked, now processing answer
-            if "mann" in message.lower() or "man" in message.lower():
-                gender = "Mann" if not is_english else "man"
-            elif "frau" in message.lower() or "woman" in message.lower():
-                gender = "Frau" if not is_english else "woman"
-            elif "diverse" in message.lower():
-                gender = "diverse"
-            else:
-                yield "I didn’t quite understand. Please say 'man', 'woman', or 'diverse'." if is_english else "Ich habe dich nicht ganz verstanden. Bitte sag 'Mann', 'Frau' oder 'diverse'."
-                return
-
-            # Reset flag and give a response
-            response.awaiting_gender = False
-            yield f"Got it! I'll look for great outfit ideas for {gender}. Let's get started!" if is_english else f"Alles klar! Ich suche jetzt nach tollen Outfit-Ideen für {gender}. Lass uns starten!"
-
     else:
         # Standard query engine response
         streaming_response = query_engine.query(message)
