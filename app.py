@@ -8,7 +8,6 @@ from llama_index.core import Settings
 
 from theme import CustomTheme
 
-
 path_modulhandbuch = "./dokumente"
 path_persist = os.path.join(path_modulhandbuch, "persist")
 
@@ -38,12 +37,20 @@ with open("background/closet.png", "rb") as image_file:
     encoded_string = base64.b64encode(image_file.read()).decode()
 custom_css = f"""
 .gradio-container {{
- background: url("data:image/png;base64,{encoded_string}") !important;
- background-size: cover !important;
- background-position: center !important;
- max-width: 100% !important;
- height: auto !important;
+    background: url("data:image/png;base64,{encoded_string}") !important;
+    background-size: cover !important;
+    background-position: center !important;
+    width: 100% !important;
+    height: 100vh !important; /* Full screen height */
+    display: flex;
+    flex-direction: column;
 }}
+
+#CHATBOT {{
+    flex-grow: 1; /* Ensures the chatbot grows to fill available space */
+    overflow-y: auto; /* Allows scrolling if content exceeds screen height */
+}}
+
 """
 
 
@@ -77,54 +84,62 @@ def response(message, history):
             "Your style is unique, and that's special. If you'd like, we can adjust the outfit so it feels more like 'you'!",
             "We all have days when we feel uncertain. But your outfit has potential! Let’s think about what you might like or how we can tweak it. 💡"
         ]
-        yield random.choice(uplifting_responses_en if is_english else uplifting_responses_de)
+        return random.choice(uplifting_responses_en if is_english else uplifting_responses_de)
 
     else:
         # Standard query engine response
         streaming_response = query_engine.query(message)
 
+        # Collect the full response
         answer = ""
         for text in streaming_response.response_gen:
-            time.sleep(0.05)
+            time.sleep(0.05)  # Optional, if you want to simulate streaming
             answer += text
-            yield answer
+
+        return answer
 
 
 theme = CustomTheme()
 
 
 def main():
-    chatbot = gr.Chatbot(
-        value=[{"role": "assistant",
-                "content": "Hey! Was steht heute an? Brauchst du Outfit-Ideen oder Styling-Tipps?"}],
-        type="messages",
-        show_label=False,
-        avatar_images=("./avatar_images/avatar-person.jpeg",
-                       "./avatar_images/avatar-bot.png"),
-        elem_id="CHATBOT"
-    )
+    with gr.Blocks(theme=theme, css=custom_css) as demo:
+        chatbot = gr.Chatbot(
+            value=[{"role": "assistant",
+                    "content": "Hey! Was steht heute an? Brauchst du Outfit-Ideen oder Styling-Tipps?"}],
+            type="messages",
+            show_label=False,
+            avatar_images=("./avatar_images/avatar-person.jpeg",
+                           "./avatar_images/avatar-bot.png"),
+            elem_id="CHATBOT"
+        )
 
-    with open("background_new.jpg", "rb") as image_file:
-        encoded_string = base64.b64encode(image_file.read()).decode()
-    custom_css = f"""
-    .gradio-container {{
-        background: url("data:image/png;base64,{encoded_string}") !important;
-        background-size: cover !important;
-        background-position: center !important;
-        max-width: 100% !important;
-        height: auto !important;
-    }}"""
+        chat_input = gr.MultimodalTextbox(
+            interactive=True,
+            file_count="multiple",
+            placeholder="Enter message or upload file...",
+            show_label=False,
+        )
 
-    chatinterface = gr.ChatInterface(
-        fn=response,
-        chatbot=chatbot,
-        type="messages",
-        theme=theme,
-        css=custom_css,
-        css_paths="./styles.css"
-    )
+        def handle_message(history, message):
+            # Append user message
+            for x in message.get("files", []):
+                history.append({"role": "user", "content": {"path": x}})
+            if message.get("text"):
+                history.append({"role": "user", "content": message["text"]})
 
-    chatinterface.launch(inbrowser=True)
+            # Generate assistant response
+            response_text = response(message.get("text", ""), history)
+            history.append({"role": "assistant", "content": response_text})
+
+            yield history, gr.MultimodalTextbox(value=None, interactive=True)
+
+    # Connect the chat input to handle_message function
+        chat_input.submit(
+            handle_message, [chatbot, chat_input], [chatbot, chat_input]
+        )
+
+        demo.launch(inbrowser=True)
 
 
 if __name__ == "__main__":
