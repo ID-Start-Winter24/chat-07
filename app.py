@@ -5,6 +5,7 @@ import gradio as gr
 from llama_index.core import VectorStoreIndex, SimpleDirectoryReader, StorageContext, load_index_from_storage, PromptTemplate
 from llama_index.llms.openai import OpenAI
 from llama_index.core import Settings
+from langdetect import detect
 
 from theme import CustomTheme
 
@@ -64,13 +65,27 @@ def response(message, history):
                                "nicht gut", "nicht schön", "grässlich", "furchtbar", "katastrophe"]
 
     # Keywords indicating interest in new outfits
-    outfit_request_phrases = ["outfit", "empfehlung", "style", "anziehen"]
-    buy_new_phrases = ["neu kaufen", "buy new", "neues kaufen", "new outfit"]
+    outfit_request_phrases = [
+        "outfit", "empfehlung", "style", "anziehen", "kombination", "kleidung",
+        "modetipps", "styling", "look", "neu kombinieren", "outfit ideen", "kleiderideen",
+        "outfit ideas", "clothing suggestions", "style ideas", "fashion tips", "mix and match",
+        "wardrobe suggestions", "what to wear", "fashion styling"
+    ]
 
-    # Detect language (simple check for English or German based on keywords)
-    is_english = any(word in message.lower()
-                     for word in ["outfit", "wear", "style", "buy", "new", "ugly"])
+    # Keywords indicating interest in buying new clothes
+    buy_new_phrases = [
+        "neu kaufen", "buy new", "neues kaufen", "new outfit", "neue kleidung kaufen",
+        "kaufen", "shoppen", "shopping", "neue sachen kaufen", "mode kaufen", "neues kleidungsstück",
+        "neue mode", "buy clothes", "buy fashion", "new clothes", "shopping spree", "buy a new look"
+    ]
 
+    # Detect language (using langdetect for better accuracy)
+    try:
+        language = detect(message)  # This will return either 'en' or 'de'
+    except:
+        language = 'de'  # Fallback to German if detection fails
+
+    # Detecting if the user is dissatisfied with their outfit
     if any(phrase in message.lower() for phrase in negative_outfit_phrases):
         uplifting_responses_de = [
             "Es tut mir leid, dass du dich gerade so fühlst. Lass uns zusammen schauen, wie wir dein Outfit aufwerten können – vielleicht mit Accessoires oder einem neuen Styling-Twist! 😊",
@@ -86,7 +101,37 @@ def response(message, history):
             "Your style is unique, and that's special. If you'd like, we can adjust the outfit so it feels more like 'you'!",
             "We all have days when we feel uncertain. But your outfit has potential! Let’s think about what you might like or how we can tweak it. 💡"
         ]
-        yield random.choice(uplifting_responses_en if is_english else uplifting_responses_de)
+        yield random.choice(uplifting_responses_en if language == 'en' else uplifting_responses_de)
+
+    elif any(phrase in message.lower() for phrase in outfit_request_phrases):
+        # Check if the user is requesting to buy new items
+        if any(phrase in message.lower() for phrase in buy_new_phrases):
+            # Proceed with suggesting new outfits
+            new_outfit_responses_de = [
+                "Verstehe, du möchtest also etwas Neues kaufen! Ich kann dir helfen, das perfekte Outfit zu finden. Was hast du im Kopf?",
+                "Wenn du etwas Neues kaufen möchtest, lass uns schauen, was aktuell im Trend ist. Ich helfe dir, das perfekte Teil zu finden!",
+                "Klar, neue Outfits sind immer spannend! Lass uns herausfinden, was du suchst und was zu deinem Stil passt."
+            ]
+            new_outfit_responses_en = [
+                "Got it, you'd like to buy something new! I can help you find the perfect outfit. What do you have in mind?",
+                "If you're looking to buy something new, let's see what's trending. I'll help you find the perfect piece!",
+                "Sure, new outfits are always exciting! Let's figure out what you're looking for and what fits your style."
+            ]
+            yield random.choice(new_outfit_responses_en if language == 'en' else new_outfit_responses_de)
+
+        else:
+            # Ask the user about their current wardrobe only if they are not requesting to buy new items
+            wardrobe_responses_de = [
+                "Bevor wir etwas Neues kaufen, was hast du bereits in deinem Kleiderschrank? Vielleicht können wir damit ein tolles Outfit zusammenstellen!",
+                "Ich schlag vor, wir schauen zuerst in deinem Kleiderschrank nach. Was hast du schon, mit dem wir etwas zusammenstellen können?",
+                "Es ist immer gut, zuerst zu schauen, was du schon hast. Hast du vielleicht ein Lieblingsstück, mit dem wir beginnen können?"
+            ]
+            wardrobe_responses_en = [
+                "Before we buy anything new, what do you already have in your wardrobe? Maybe we can put together a great outfit with that!",
+                "I suggest we take a look at what you already have in your wardrobe first. What do you have that we can work with?",
+                "It's always good to check what you already own first. Do you have a favorite piece we could start with?"
+            ]
+            yield random.choice(wardrobe_responses_en if language == 'en' else wardrobe_responses_de)
 
     else:
         # Standard query engine response
