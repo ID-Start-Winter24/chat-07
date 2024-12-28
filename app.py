@@ -38,12 +38,21 @@ with open("background/closet.png", "rb") as image_file:
     encoded_string = base64.b64encode(image_file.read()).decode()
 custom_css = f"""
 .gradio-container {{
- background: url("data:image/png;base64,{encoded_string}") !important;
- background-size: cover !important;
- background-position: center !important;
- max-width: 100% !important;
- height: auto !important;
+    background: url("data:image/png;base64,{encoded_string}") !important;
+    background-size: cover !important;
+    background-position: center !important;
+    width: 100% !important;
+    height: 100vh !important; /* Full screen height */
+    display: flex;
+    flex-direction: column;
 }}
+
+#CHATBOT {{
+    flex-grow: 1; /* Ensures the chatbot grows to fill available space */
+    overflow-y: auto; /* Allows scrolling if content exceeds screen height */
+}}
+
+
 """
 
 
