@@ -69,7 +69,6 @@ custom_css = f"""
     overflow-y: auto; /* Allows scrolling if content exceeds screen height */
 }}
 
-
 """
 
 # Define the response function
