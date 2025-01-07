@@ -1,6 +1,7 @@
 import os
 import time
 import base64
+import random
 import gradio as gr
 from llama_index.core import VectorStoreIndex, SimpleDirectoryReader, StorageContext, load_index_from_storage, PromptTemplate
 from llama_index.llms.openai import OpenAI
@@ -13,13 +14,27 @@ path_persist = os.path.join(path_modulhandbuch, "persist")
 
 Settings.llm = OpenAI(temperature=0.1, model="gpt-4o-mini")
 
+# Check if the persist directory exists
 if not os.path.exists(path_persist):
     documents = SimpleDirectoryReader("./dokumente/").load_data()
-    index = VectorStoreIndex.from_documents(documents)
-    index.storage_context.persist(persist_dir=path_persist)
+
+    # Log document loading
+    print(f"Loaded {len(documents)} documents.")
+
+    try:
+        index = VectorStoreIndex.from_documents(documents)
+        index.storage_context.persist(persist_dir=path_persist)
+        print("Index persisted successfully.")
+    except Exception as e:
+        print(f"Error creating and persisting index: {e}")
 else:
-    storage_context = StorageContext.from_defaults(persist_dir=path_persist)
-    index = load_index_from_storage(storage_context)
+    try:
+        storage_context = StorageContext.from_defaults(
+            persist_dir=path_persist)
+        index = load_index_from_storage(storage_context)
+        print("Index loaded from storage.")
+    except Exception as e:
+        print(f"Error loading index from storage: {e}")
 
 template = (
     "We have provided context information below. \n"
@@ -29,12 +44,15 @@ template = (
     "Given only this information and without using general knowledge, please answer in the appropriate language (German or English) based on the query: {query_str}\n"
 )
 qa_template = PromptTemplate(template)
+
+# Set up query engine
 query_engine = index.as_query_engine(
     streaming=True, text_qa_template=qa_template)
 
 background_path = os.path.join("background", "closet.png")
 with open("background/closet.png", "rb") as image_file:
     encoded_string = base64.b64encode(image_file.read()).decode()
+
 custom_css = f"""
 .gradio-container {{
     background: url("data:image/png;base64,{encoded_string}") !important;
@@ -51,12 +69,13 @@ custom_css = f"""
     overflow-y: auto; /* Allows scrolling if content exceeds screen height */
 }}
 
+
 """
+
+# Define the response function
 
 
 def response(message, history):
-    import random
-
     # Keywords indicating dissatisfaction with any outfit
     negative_outfit_phrases = ["hässlich", "ugly", "schlecht",
                                "nicht gut", "nicht schön", "grässlich", "furchtbar", "katastrophe"]
@@ -85,18 +104,21 @@ def response(message, history):
             "We all have days when we feel uncertain. But your outfit has potential! Let’s think about what you might like or how we can tweak it. 💡"
         ]
         return random.choice(uplifting_responses_en if is_english else uplifting_responses_de)
-
     else:
-        # Standard query engine response
-        streaming_response = query_engine.query(message)
+        try:
+            # Standard query engine response
+            streaming_response = query_engine.query(message)
 
-        # Collect the full response
-        answer = ""
-        for text in streaming_response.response_gen:
-            time.sleep(0.05)  # Optional, if you want to simulate streaming
-            answer += text
+            # Collect the full response
+            answer = ""
+            for text in streaming_response.response_gen:
+                time.sleep(0.05)  # Optional, if you want to simulate streaming
+                answer += text
 
-        return answer
+            return answer
+        except Exception as e:
+            print(f"Error during query processing: {e}")
+            return "Entschuldigung, es gab ein Problem mit der Anfrage. Bitte versuche es später noch einmal."
 
 
 theme = CustomTheme()
@@ -134,7 +156,7 @@ def main():
 
             yield history, gr.MultimodalTextbox(value=None, interactive=True)
 
-    # Connect the chat input to handle_message function
+        # Connect the chat input to handle_message function
         chat_input.submit(
             handle_message, [chatbot, chat_input], [chatbot, chat_input]
         )
