@@ -48,6 +48,10 @@ custom_css = f"""
     flex-direction: column;
 }}
 
+#CHATBOT {{
+    flex-grow: 1; /* Ensures the chatbot grows to fill available space */
+    overflow-y: auto; /* Allows scrolling if content exceeds screen height */
+}}
 
 
 """
