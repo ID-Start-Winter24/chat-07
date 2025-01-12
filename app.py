@@ -5,6 +5,7 @@ from llama_index.core import VectorStoreIndex, SimpleDirectoryReader, StorageCon
 from llama_index.llms.openai import OpenAI
 from llama_index.core import Settings
 from langdetect import detect
+import base64
 
 from theme import CustomTheme
 
@@ -40,26 +41,38 @@ template = (
     "inspiring, self-assured, open-minded, trendy, and fully dedicated to sustainability in fashion.\n"
 )
 
-
 # Create the query engine
 qa_template = PromptTemplate(template)
 query_engine = index.as_query_engine(
     streaming=True, text_qa_template=qa_template
 )
 
-# Custom CSS for chatbot interface
-custom_css = """
-.gradio-container {
-    width: 100% !important;
-    height: 100vh !important; /* Full screen height */
-    display: flex;
-    flex-direction: column;
-}
+with open("stylemate-background.jpg", "rb") as image_file:
+    encoded_string = base64.b64encode(image_file.read()).decode()
 
-#CHATBOT {
-    flex-grow: 1; /* Ensures the chatbot grows to fill available space */
-    overflow-y: auto; /* Allows scrolling if content exceeds screen height */
-}
+# Custom CSS for chatbot interface
+custom_css = f"""
+.gradio-container {{
+    background: url("data:image/png;base64,{encoded_string}") !important;
+  background-size: cover;
+  font-family: "Merriweather", serif; /* Serifen-Schriftart wie auf der Elle-Webseite */
+  height: 100vh; /* Vollbildhöhe */
+  display: flex;
+  flex-direction: column; /* Vertikales Layout */
+  justify-content: flex-start; /* Startet den Inhalt oben */
+  align-items: center; /* Zentrierung horizontal */
+  color: #333; /* Schwarzer Text */
+  margin: 0; /* Kein zusätzlicher Rand */
+  padding: 20px 0; /* Abstand oben und unten */
+  box-sizing: border-box; /* Um Padding und Border korrekt zu berücksichtigen */
+  overflow: hidden; /* Verhindert unerwünschtes Scrollen */
+}}
+
+
+#CHATBOT {{
+    flex-grow: 0; /* Prevent excessive resizing */
+    margin: auto; /* Center within the flex container */
+}}
 """
 
 # Define the response function
@@ -85,72 +98,74 @@ def response(message, history):
                 "I'm sorry you're feeling this way. Let's see how we can improve your outfit – maybe with accessories or a fresh styling twist! 😊",
                 "Fashion is about how you feel in it – not just the clothing itself. I'm sure we can find something that makes you shine! 💖",
                 "Small details can make a big difference. Maybe we can enhance your outfit with a belt, a jacket, or some jewelry? Shall I help you? 🌟",
-                "Your style is unique, and that's special. If you'd like, we can adjust the outfit so it feels more like 'you'!",
-                "We all have days when we feel uncertain. But your outfit has potential! Let’s think about what you might like or how we can tweak it. 💡"
             ],
             "de": [
                 "Es tut mir leid, dass du dich gerade so fühlst. Lass uns zusammen schauen, wie wir dein Outfit aufwerten können – vielleicht mit Accessoires oder einem neuen Styling-Twist! 😊",
                 "Mode ist, wie du dich darin fühlst – nicht nur das Kleidungsstück selbst. Ich bin sicher, wir finden etwas, das dich zum Strahlen bringt! 💖",
                 "Manchmal machen kleine Details einen großen Unterschied. Vielleicht können wir dein Outfit mit einem Gürtel, einer Jacke oder Schmuck aufpeppen? Soll ich dir helfen? 🌟",
-                "Dein Stil ist einzigartig, und das ist etwas Besonderes. Wenn du magst, können wir das Outfit so anpassen, dass es sich mehr wie 'du' anfühlt!",
-                "Wir alle haben Tage, an denen wir uns unsicher fühlen. Aber dein Outfit hat Potenzial! Lass uns gemeinsam überlegen, was dir daran gefallen könnte oder wie wir es optimieren können. 💡"
             ]
         }
-        # Split responses into sentences
         for sentence in random.choice(responses[language]).split(". "):
             yield sentence.strip() + "."
-            time.sleep(1.0)  # Add delay for typing effect
+            time.sleep(1.0)
     else:
-        # Add the new message to history
         history.append({"role": "user", "content": message})
 
-        # Construct the context by joining past messages in history
-        # Use last 5 messages as context
+        # Use the query engine
         context = "\n".join([entry['content'] for entry in history[-5:]])
-
-        # Use query engine for standard responses, passing the constructed context
         streaming_response = query_engine.query(
             f"Context: {context}\nUser: {message}")
 
-        answer = ""
+        answer = "**StyleMate:**\n"
         for text in streaming_response.response_gen:
-            time.sleep(0.1)  # Add delay for each chunk
+            time.sleep(0.1)
             answer += text
             yield answer
 
-        # Add the assistant's response to history
         history.append({"role": "assistant", "content": answer})
 
 
 # Create the chatbot interface
 theme = CustomTheme()
 
+design_html = f"""
+<div style="display: flex; flex-direction: column; justify-content: space-between; background-color: #ffffff; margin: 0; padding: 0; padding-bottom: 2vw; width:100%; height:auto;">
+    <div style="font-family: Arial; background-color: #ffffff; margin-left: 0.2vw;">
+        <div class="image-container">
+            <img src="data:image/png;base64,{encoded_string}" alt="stylemate", width="70%">
+        </div>
+
+    </div>
+           <hr />
+</div>
+"""
+
 
 def main():
-    chatbot = gr.Chatbot(
-        value=[{"role": "assistant",
-                "content": (
-                    "Hey, schön, dass du hier bist! Lust auf frische Outfit-Ideen oder stylische Tipps? "
-                    "Ich helfe dir gern weiter. Übrigens, wenn du lieber Englisch sprechen möchtest, "
-                    "feel free to ask in English anytime!"
-                )}],
-        type="messages",
-        show_label=False,
-        avatar_images=("./avatar_images/avatar-person.jpeg",
-                       "./avatar_images/avatar-bot.png"),
-        elem_id="CHATBOT"
-    )
+    with gr.Blocks(css_paths="./styles.css") as stylemate_app:
+        gr.HTML(design_html)
+        chatbot = gr.Chatbot(
+            value=[{"role": "assistant",
+                    "content": ("**StyleMate:**\n"
+                                "Hey, schön, dass du hier bist! Lust auf frische Outfit-Ideen oder stylische Tipps? "
+                                "Ich helfe dir gern weiter. Übrigens, wenn du lieber Englisch sprechen möchtest, "
+                                "feel free to ask in English anytime!"
+                                )}],
+            type="messages",
+            show_label=False,
+            elem_id="CHATBOT"  # No avatars used
+        )
 
-    chatinterface = gr.ChatInterface(
-        fn=response,
-        chatbot=chatbot,
-        type="messages",
-        theme=theme,
-        css=custom_css,
-        css_paths="./styles.css"
-    )
+        chatinterface = gr.ChatInterface(
+            fn=response,
+            chatbot=chatbot,
+            type="messages",
+            theme=theme,
+            # css=custom_css,
 
-    chatinterface.launch(inbrowser=True)
+        )
+
+    stylemate_app.launch(inbrowser=True)
 
 
 if __name__ == "__main__":

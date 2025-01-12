@@ -1,83 +1,113 @@
-/* Importing Google Font */
-@import url("https://fonts.googleapis.com/css2?family=Hind+Madurai:wght@300;400;500;600;700&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=Merriweather:wght@300;400;700&display=swap");
 
-/* Ensuring the chat container fills the full screen */
 .gradio-container {
-  background: url("data:image/png;base64,....") !important;
-  background-size: cover !important;
-  background-position: center !important;
-  width: 100% !important;
-  height: 100vh !important; /* Full height of the screen */
+  font-family: "Merriweather", serif; /* Serifen-Schriftart wie auf der Elle-Webseite */
+  height: 100vh; /* Vollbildhöhe */
   display: flex;
-  justify-content: flex-end; /* Aligns the chatbox to the right */
-  flex-direction: column;
-  padding-right: 5%; /* Add space from the edge */
+  flex-direction: column; /* Vertikales Layout */
+  justify-content: flex-start; /* Startet den Inhalt oben */
+  align-items: center; /* Zentrierung horizontal */
+  color: #333; /* Schwarzer Text */
+  margin: 0; /* Kein zusätzlicher Rand */
+  padding: 20px 0; /* Abstand oben und unten */
+  box-sizing: border-box; /* Um Padding und Border korrekt zu berücksichtigen */
+  overflow: hidden; /* Verhindert unerwünschtes Scrollen */
 }
 
-/* Chatbot area styling */
-#CHATBOT {
+/* Gesamtcontainer (Hintergrund, Layout, etc.) */
+
+/* Vertikale schwarze Linien an den Seiten */
+.gradio-container::before,
+.gradio-container::after {
+  content: "";
   position: absolute;
-  right: 0;
   top: 0;
-  width: 50%; /* Chatbox takes 50% of the screen width */
-  height: 100%; /* Full height of the screen */
-  overflow-y: auto; /* Scrollable if content exceeds screen height */
-  background: rgba(255, 255, 255, 0.7);
-  border-radius: 16px;
-  box-shadow: 0 4px 30px #d6dade;
-  backdrop-filter: blur(4.5px);
-  -webkit-backdrop-filter: blur(4.5px);
-  border: 1px solid rgba(255, 255, 255, 0.28);
+  bottom: 0;
+  width: 5px;
+  background-color: black; /* Schwarze vertikale Linie */
+}
+
+.gradio-container::before {
+  left: 0;
+}
+
+.gradio-container::after {
+  right: 0;
+}
+
+/* Chatbot Fenster */
+#CHATBOT {
+  width: 500px; /* Breite des Chatfensters */
+  max-height: 70%; /* Dynamische Höhe */
+  background: rgba(255, 255, 255, 1); /* Transparenter Hintergrund */
+  border-radius: 20px;
+  box-shadow: 0 6px 30px #aaa; /* Modischer Schatten */
   display: flex;
   flex-direction: column;
+  justify-content: space-between; /* Eingabefeld immer unten */
+  overflow: hidden;
+  backdrop-filter: blur(10px); /* Unscharfer Hintergrund */
+  border: 1px solid #ffffff4d;
+  padding: 20px; /* Padding rundum */
+  box-sizing: border-box; /* Um Padding korrekt zu berücksichtigen */
+  margin-bottom: 20px; /* Abstand zur Eingabe */
+  margin-top: 40px; /* Verschiebt die Box etwas nach unten */
 }
 
-/* User and bot message styling */
-.message.bot {
-  background: rgba(255, 255, 255, 0.6) !important;
-
-  font-family: "Hind Madurai", sans-serif;
+/* Überschrift des Chatbots */
+.header-title {
+  font-size: 36px;
+  font-weight: 700;
+  color: #222;
+  text-align: center;
+  font-family: "Merriweather", serif; /* Wie auf Elle */
+  padding-bottom: 20px;
+  margin-top: 0;
+  width: 100%;
 }
 
-.message.bot * {
-  color: #000000;
+/* Input Box Styling */
+#component-6 {
+  width: 500px;
+  background: rgba(255, 255, 255, 0.9); /* Transparenter Hintergrund */
+  border: 1px solid #ddd;
+  border-radius: 12px;
+  padding: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between; /* Button rechts */
+  box-sizing: border-box;
 }
 
-.message.user {
-  background: rgba(0, 0, 0, 0.35) !important;
-  font-family: "Hind Madurai", sans-serif;
-}
-
-.message.user * {
-  color: #ffffff !important;
-}
-
-/* Avatar image adjustments */
-.avatar-container img {
-  padding: 0 !important;
-}
-
-/* Input and text area styling */
-input,
-textarea {
+.chatbot-input textarea {
   flex-grow: 1;
-  border: 2px solid #000000 !important;
-  border-radius: 50px; /* Rounded corners */
-  background-color: #e8e9ea !important;
-  color: #000000 !important;
+  resize: none;
+  border: none;
+  border-radius: 8px;
+  padding: 10px;
+  font-family: "Merriweather", serif;
+  color: #333;
+  background: #f7f7f7;
+  box-sizing: border-box;
 }
 
-/* Dark mode input and textarea styling */
-body.dark-mode input,
-body.dark-mode textarea {
-  background-color: #2c2c2c !important;
-
-  color: #cccccc !important;
-
-  border: 2px solid #cccccc !important;
+.chatbot-input textarea:focus {
+  outline: none;
+  background: #fff;
 }
 
-/* Ensure input field stays at the bottom */
-#input-container {
-  margin-top: auto !important; /* Pushes the input to the bottom */
+.chatbot-input .send-btn {
+  margin-left: 10px;
+  padding: 10px 15px;
+  border-radius: 12px;
+  background-color: hsl(0, 0%, 74%);
+  color: white;
+  font-weight: bold;
+  border: none;
+  cursor: pointer;
+  transition: 0.3s;
+}
+
+.chatbot-input .send-btn:hover {
+  background-color: rgb(204, 204, 204);
 }
