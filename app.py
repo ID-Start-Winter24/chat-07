@@ -118,7 +118,11 @@ theme = CustomTheme()
 def main():
     chatbot = gr.Chatbot(
         value=[{"role": "assistant",
-                "content": "Hey! Was steht heute an? Brauchst du Outfit-Ideen oder Styling-Tipps?"}],
+                "content": (
+                    "Hey, schön, dass du hier bist! Lust auf frische Outfit-Ideen oder stylische Tipps? "
+                    "Ich helfe dir gern weiter. Übrigens, wenn du lieber Englisch sprechen möchtest, "
+                    "feel free to ask in English anytime!"
+                )}],
         type="messages",
         show_label=False,
         avatar_images=("./avatar_images/avatar-person.jpeg",
