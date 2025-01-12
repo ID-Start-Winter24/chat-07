@@ -9,12 +9,18 @@
   width: 100% !important;
   height: 100vh !important; /* Full height of the screen */
   display: flex;
+  justify-content: flex-end; /* Aligns the chatbox to the right */
   flex-direction: column;
+  padding-right: 5%; /* Add space from the edge */
 }
 
-/* Chatbot area should expand to fill available space */
+/* Chatbot area styling */
 #CHATBOT {
-  flex-grow: 1; /* Expands chatbot to take up available space */
+  position: absolute;
+  right: 0;
+  top: 0;
+  width: 50%; /* Chatbox takes 50% of the screen width */
+  height: 100%; /* Full height of the screen */
   overflow-y: auto; /* Scrollable if content exceeds screen height */
   background: rgba(255, 255, 255, 0.7);
   border-radius: 16px;
@@ -22,11 +28,14 @@
   backdrop-filter: blur(4.5px);
   -webkit-backdrop-filter: blur(4.5px);
   border: 1px solid rgba(255, 255, 255, 0.28);
+  display: flex;
+  flex-direction: column;
 }
 
 /* User and bot message styling */
 .message.bot {
   background: rgba(255, 255, 255, 0.6) !important;
+
   font-family: "Hind Madurai", sans-serif;
 }
 
@@ -51,6 +60,7 @@
 /* Input and text area styling */
 input,
 textarea {
+  flex-grow: 1;
   border: 2px solid #000000 !important;
   border-radius: 50px; /* Rounded corners */
   background-color: #e8e9ea !important;
@@ -61,7 +71,9 @@ textarea {
 body.dark-mode input,
 body.dark-mode textarea {
   background-color: #2c2c2c !important;
+
   color: #cccccc !important;
+
   border: 2px solid #cccccc !important;
 }
 

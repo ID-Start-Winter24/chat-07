@@ -9,7 +9,6 @@ from langdetect import detect
 
 from theme import CustomTheme
 
-
 path_modulhandbuch = "./dokumente"
 path_persist = os.path.join(path_modulhandbuch, "persist")
 
@@ -26,27 +25,31 @@ else:
 template = (
     "We have provided context information below. \n"
     "---------------------\n"
-    "{context_str}"
-    "\n---------------------\n"
+    "{context_str}" "\n---------------------\n"
     "Given only this information and without using general knowledge, please answer in the appropriate language (German or English) based on the query: {query_str}\n"
 )
 qa_template = PromptTemplate(template)
 query_engine = index.as_query_engine(
-    streaming=True, text_qa_template=qa_template)
+    streaming=True, text_qa_template=qa_template
+)
 
-
-custom_css = """
-.gradio-container {
+background_path = os.path.join("background", "closet.png")
+with open("background/closet.png", "rb") as image_file:
+    encoded_string = base64.b64encode(image_file.read()).decode()
+custom_css = f""" .gradio-container {{
+    background: url("data:image/png;base64,{encoded_string}") !important;
+    background-size: cover !important;
+    background-position: center !important;
     width: 100% !important;
-    height: 100vh !important; /* Full screen height */
+    height: 100vh !important;
     display: flex;
     flex-direction: column;
-}
+}}
 
-#CHATBOT {
-    flex-grow: 1; /* Ensures the chatbot grows to fill available space */
-    overflow-y: auto; /* Allows scrolling if content exceeds screen height */
-}
+#CHATBOT {{
+    flex-grow: 1;
+    overflow-y: auto;
+}}
 """
 
 
@@ -59,17 +62,16 @@ def response(message, history):
 
     # Keywords indicating interest in new outfits
     outfit_request_phrases = [
-        "outfit", "empfehlung", "style", "anziehen", "kombination", "kleidung",
-        "modetipps", "styling", "look", "neu kombinieren", "outfit ideen", "kleiderideen",
-        "outfit ideas", "clothing suggestions", "style ideas", "fashion tips", "mix and match",
-        "wardrobe suggestions", "what to wear", "fashion styling"
+        "outfit", "empfehlung", "style", "anziehen", "kombination", "kleidung", "modetipps", "styling",
+        "look", "neu kombinieren", "outfit ideen", "kleiderideen", "outfit ideas", "clothing suggestions",
+        "style ideas", "fashion tips", "mix and match", "wardrobe suggestions", "what to wear", "fashion styling"
     ]
 
     # Keywords indicating interest in buying new clothes
     buy_new_phrases = [
-        "neu kaufen", "buy new", "neues kaufen", "new outfit", "neue kleidung kaufen",
-        "kaufen", "shoppen", "shopping", "neue sachen kaufen", "mode kaufen", "neues kleidungsstück",
-        "neue mode", "buy clothes", "buy fashion", "new clothes", "shopping spree", "buy a new look"
+        "neu kaufen", "buy new", "neues kaufen", "new outfit", "neue kleidung kaufen", "kaufen", "shoppen",
+        "shopping", "neue sachen kaufen", "mode kaufen", "neues kleidungsstück", "neue mode", "buy clothes",
+        "buy fashion", "new clothes", "shopping spree", "buy a new look"
     ]
 
     # Detect language (using langdetect for better accuracy)
@@ -129,12 +131,11 @@ def response(message, history):
     else:
         # Standard query engine response
         streaming_response = query_engine.query(message)
-
         answer = ""
         for text in streaming_response.response_gen:
             time.sleep(0.05)
             answer += text
-            yield answer
+        yield answer
 
 
 theme = CustomTheme()
@@ -142,14 +143,26 @@ theme = CustomTheme()
 
 def main():
     chatbot = gr.Chatbot(
-        value=[{"role": "assistant",
-                "content": "Hey! Was steht heute an? Brauchst du Outfit-Ideen oder Styling-Tipps?"}],
+        value=[{
+            "role": "assistant",
+            "content": "Hey! Was steht heute an? Brauchst du Outfit-Ideen oder Styling-Tipps?"
+        }],
         type="messages",
         show_label=False,
         avatar_images=("./avatar_images/avatar-person.jpeg",
                        "./avatar_images/avatar-bot.png"),
         elem_id="CHATBOT"
     )
+
+    with open("background_new.jpg", "rb") as image_file:
+        encoded_string = base64.b64encode(image_file.read()).decode()
+        custom_css = f""" .gradio-container {{
+            background: url("data:image/png;base64, {encoded_string}") !important;
+            background-size: cover !important;
+            background-position: center !important;
+            max-width: 100% !important;
+            height: auto !important;
+        }}"""
 
     chatinterface = gr.ChatInterface(
         fn=response,
