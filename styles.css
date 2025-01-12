@@ -1,81 +1,57 @@
 @import url("https://fonts.googleapis.com/css2?family=Merriweather:wght@300;400;700&display=swap");
 
 .gradio-container {
-  font-family: "Merriweather", serif; /* Serifen-Schriftart wie auf der Elle-Webseite */
-  height: 100vh; /* Vollbildhöhe */
-  display: flex;
-  flex-direction: column; /* Vertikales Layout */
-  justify-content: flex-start; /* Startet den Inhalt oben */
-  align-items: center; /* Zentrierung horizontal */
-  color: #333; /* Schwarzer Text */
-  margin: 0; /* Kein zusätzlicher Rand */
-  padding: 20px 0; /* Abstand oben und unten */
-  box-sizing: border-box; /* Um Padding und Border korrekt zu berücksichtigen */
-  overflow: hidden; /* Verhindert unerwünschtes Scrollen */
-}
-
-/* Gesamtcontainer (Hintergrund, Layout, etc.) */
-
-/* Vertikale schwarze Linien an den Seiten */
-.gradio-container::before,
-.gradio-container::after {
-  content: "";
-  position: absolute;
-  top: 0;
-  bottom: 0;
-  width: 5px;
-  background-color: black; /* Schwarze vertikale Linie */
-}
-
-.gradio-container::before {
-  left: 0;
-}
-
-.gradio-container::after {
-  right: 0;
-}
-
-/* Chatbot Fenster */
-#CHATBOT {
-  width: 500px; /* Breite des Chatfensters */
-  max-height: 70%; /* Dynamische Höhe */
-  background: rgba(255, 255, 255, 1); /* Transparenter Hintergrund */
-  border-radius: 20px;
-  box-shadow: 0 6px 30px #aaa; /* Modischer Schatten */
+  font-family: "Merriweather", serif;
+  height: 100vh;
   display: flex;
   flex-direction: column;
-  justify-content: space-between; /* Eingabefeld immer unten */
+  justify-content: flex-start;
+  align-items: center;
+  color: #333;
+  margin: 0;
+  padding: 20px 0;
+  box-sizing: border-box;
   overflow: hidden;
-  backdrop-filter: blur(10px); /* Unscharfer Hintergrund */
-  border: 1px solid #ffffff4d;
-  padding: 20px; /* Padding rundum */
-  box-sizing: border-box; /* Um Padding korrekt zu berücksichtigen */
-  margin-bottom: 20px; /* Abstand zur Eingabe */
-  margin-top: 40px; /* Verschiebt die Box etwas nach unten */
 }
 
-/* Überschrift des Chatbots */
+#CHATBOT {
+  width: 750px;
+  max-height: 20%;
+  background: #ffffff;
+  border-radius: 20px;
+  box-shadow: 0 6px 30px #aaa;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  overflow: hidden;
+  backdrop-filter: blur(10px);
+  border: 1px solid #ffffff4d;
+  box-sizing: border-box;
+  margin-bottom: 20px;
+  margin-top: -30px;
+  font-size: 18px;
+}
+
 .header-title {
   font-size: 36px;
   font-weight: 700;
   color: #222;
   text-align: center;
-  font-family: "Merriweather", serif; /* Wie auf Elle */
+  font-family: "Merriweather", serif;
   padding-bottom: 20px;
   margin-top: 0;
   width: 100%;
 }
 
-/* Input Box Styling */
 #component-6 {
   width: 500px;
-  background: rgba(255, 255, 255, 0.9); /* Transparenter Hintergrund */
+  background: rgba(255, 255, 255, 0.9);
   border: 1px solid #ddd;
   border-radius: 12px;
   padding: 10px;
   display: flex;
   align-items: center;
-  justify-content: space-between; /* Button rechts */
+  justify-content: space-between;
   box-sizing: border-box;
 }
 
@@ -110,4 +86,85 @@
 
 .chatbot-input .send-btn:hover {
   background-color: rgb(204, 204, 204);
+}
+
+/* Responsive Styles */
+@media screen and (max-width: 1024px) {
+  #CHATBOT {
+    width: 80%;
+    font-size: 16px;
+  }
+
+  .header-title {
+    font-size: 28px;
+  }
+
+  .image-container img {
+    width: 90%;
+    max-width: 100%;
+  }
+}
+
+@media screen and (max-width: 768px) {
+  #CHATBOT {
+    width: 90%;
+    font-size: 14px;
+  }
+
+  .header-title {
+    font-size: 24px;
+  }
+
+  .chatbot-input textarea {
+    width: 100%;
+  }
+
+  .image-container img {
+    width: 85%;
+    max-width: 100%;
+  }
+}
+
+@media screen and (max-width: 480px) {
+  #CHATBOT {
+    width: 80%;
+    font-size: 14px;
+  }
+
+  .header-title {
+    font-size: 20px;
+  }
+
+  .chatbot-input textarea {
+    width: 100%;
+  }
+
+  .gradio-container {
+    padding: 10px 0;
+  }
+
+  .image-container img {
+    width: 80%;
+    max-width: 100%;
+  }
+}
+
+@media screen and (max-width: 375px) {
+  #CHATBOT {
+    width: 50%;
+    font-size: 10px;
+  }
+
+  .header-title {
+    font-size: 18px;
+  }
+
+  .chatbot-input textarea {
+    font-size: 12px;
+  }
+
+  .image-container img {
+    width: 70%;
+    max-width: 100%;
+  }
 }

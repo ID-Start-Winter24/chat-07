@@ -47,13 +47,20 @@ query_engine = index.as_query_engine(
     streaming=True, text_qa_template=qa_template
 )
 
-with open("stylemate-background.jpg", "rb") as image_file:
-    encoded_string = base64.b64encode(image_file.read()).decode()
+with open("assets/screenshots/ui/stylemate-header.jpg", "rb") as header_file:
+    encoded_string = base64.b64encode(header_file.read()).decode()
+
+with open("assets/screenshots/ui/nav-bar.jpg", "rb") as nav_file:
+    encoded_string2 = base64.b64encode(nav_file.read()).decode()
+
+with open("assets/screenshots/ui/banner.jpg", "rb") as banner_file:
+    encoded_string3 = base64.b64encode(banner_file.read()).decode()
+
 
 # Custom CSS for chatbot interface
 custom_css = f"""
 .gradio-container {{
-    background: url("data:image/png;base64,{encoded_string}") !important;
+    background: #ffffff !important;
   background-size: cover;
   font-family: "Merriweather", serif; /* Serifen-Schriftart wie auf der Elle-Webseite */
   height: 100vh; /* Vollbildhöhe */
@@ -129,14 +136,22 @@ def response(message, history):
 theme = CustomTheme()
 
 design_html = f"""
-<div style="display: flex; flex-direction: column; justify-content: space-between; background-color: #ffffff; margin: 0; padding: 0; padding-bottom: 2vw; width:100%; height:auto;">
-    <div style="font-family: Arial; background-color: #ffffff; margin-left: 0.2vw;">
-        <div class="image-container">
-            <img src="data:image/png;base64,{encoded_string}" alt="stylemate", width="70%">
+<div style="display: flex; flex-direction: column; justify-content: center; align-items: center; background-color: #ffffff; margin: 0; padding: 0; padding-bottom: 2vw; width:100%; height:auto;">
+    <div style="font-family: Arial; background-color: #ffffff; margin-left: 0.2vw; text-align: center;">
+        <!-- Centered header image -->
+        <div class="image-container" style="text-align: center; padding: 0; margin-bottom: 10px;">
+            <img src="data:image/png;base64,{encoded_string}" alt="stylemate-header" width="70%" aria-label="StyleMate header image"/>
         </div>
+        <hr style="margin-top: 0; margin-bottom: 30px;" />
 
+        <!-- Navigation bar and banner image with centered styling -->
+        <div class="image-container" style="text-align: center; padding: 0px 0 0 0; margin: 0;">
+            <img src="data:image/png;base64,{encoded_string2}" alt="stylemate-nav" width="35%" style="margin-bottom: 0;" aria-label="StyleMate navigation bar image"/>
+        </div>
+        <div style="width: 100%; display: flex; justify-content: center; padding: 30px 0 0px 0; margin: 0;">
+            <img src="data:image/png;base64,{encoded_string3}" alt="stylemate-banner" width="30%" style="margin-left: -400px;" aria-label="StyleMate banner image" />
+        </div>
     </div>
-           <hr />
 </div>
 """
 
