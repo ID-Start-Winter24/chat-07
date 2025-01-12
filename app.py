@@ -6,6 +6,7 @@ import gradio as gr
 from llama_index.core import VectorStoreIndex, SimpleDirectoryReader, StorageContext, load_index_from_storage, PromptTemplate
 from llama_index.llms.openai import OpenAI
 from llama_index.core import Settings
+import openai
 
 from theme import CustomTheme
 
@@ -13,6 +14,7 @@ path_modulhandbuch = "./dokumente"
 path_persist = os.path.join(path_modulhandbuch, "persist")
 
 Settings.llm = OpenAI(temperature=0.1, model="gpt-4o-mini")
+client = openai.OpenAI()
 
 # Check if the persist directory exists
 if not os.path.exists(path_persist):
@@ -75,6 +77,7 @@ custom_css = f"""
 
 
 def response(message, history):
+    print(message)
     # Keywords indicating dissatisfaction with any outfit
     negative_outfit_phrases = ["hässlich", "ugly", "schlecht",
                                "nicht gut", "nicht schön", "grässlich", "furchtbar", "katastrophe"]
@@ -104,23 +107,24 @@ def response(message, history):
         ]
         return random.choice(uplifting_responses_en if is_english else uplifting_responses_de)
     else:
-        try:
-            # Standard query engine response
-            streaming_response = query_engine.query(message)
+        # Standard query engine response
+        streaming_response = query_engine.query(message)
 
-            # Collect the full response
-            answer = ""
-            for text in streaming_response.response_gen:
-                time.sleep(0.05)  # Optional, if you want to simulate streaming
-                answer += text
+        # Collect the full response
+        answer = ""
+        for text in streaming_response.response_gen:
+            time.sleep(0.05)  # Optional, if you want to simulate streaming
+            answer += text
 
-            return answer
-        except Exception as e:
-            print(f"Error during query processing: {e}")
-            return "Entschuldigung, es gab ein Problem mit der Anfrage. Bitte versuche es später noch einmal."
+        return answer
 
 
 theme = CustomTheme()
+
+
+def encode_image(image_path):
+    with open(image_path, "rb") as image_file:
+        return base64.b64encode(image_file.read()).decode("utf-8")
 
 
 def main():
@@ -137,20 +141,47 @@ def main():
 
         chat_input = gr.MultimodalTextbox(
             interactive=True,
-            file_count="multiple",
             placeholder="Enter message or upload file...",
             show_label=False,
         )
 
         def handle_message(history, message):
             # Append user message
+            text = message["text"]
+            files = message["files"]
+            print(text)
+            print(files)
+            picture_analyzing = ""
+            if files:
+                image = encode_image(files[0])
+                response = client.chat.completions.create(
+                    model="gpt-4o-mini",
+                    messages=[
+                        {
+                            "role": "user",
+                            "content": [
+                                {
+                                    "type": "text",
+                                    "text": "Was siehst du auf dem Bild?",
+                                },
+                                {
+                                    "type": "image_url",
+                                    "image_url": {"url": f"data:image/jpeg;base64,{image}"},
+                                },
+                            ],
+                        }
+                    ],
+                )
+
+                picture_analyzing = response.choices[0].message.content
+                # message += picture_analyzing
             for x in message.get("files", []):
                 history.append({"role": "user", "content": {"path": x}})
             if message.get("text"):
                 history.append({"role": "user", "content": message["text"]})
 
             # Generate assistant response
-            response_text = response(message.get("text", ""), history)
+            response_text = picture_analyzing
             history.append({"role": "assistant", "content": response_text})
 
             yield history, gr.MultimodalTextbox(value=None, interactive=True)
