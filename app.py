@@ -67,6 +67,7 @@ custom_css = """
 
 def response(message, history):
     import random
+    import time
 
     # Detect language
     try:
@@ -95,16 +96,19 @@ def response(message, history):
                 "Wir alle haben Tage, an denen wir uns unsicher fühlen. Aber dein Outfit hat Potenzial! Lass uns gemeinsam überlegen, was dir daran gefallen könnte oder wie wir es optimieren können. 💡"
             ]
         }
-        yield random.choice(responses[language])
-
+        # Split responses into sentences
+        for sentence in random.choice(responses[language]).split(". "):
+            yield sentence.strip() + "."
+            time.sleep(1.0)  # Add delay for typing effect
     else:
         # Use query engine for standard responses
         streaming_response = query_engine.query(message)
+
         answer = ""
         for text in streaming_response.response_gen:
-            time.sleep(0.05)
+            time.sleep(0.1)  # Add delay for each chunk
             answer += text
-        yield answer
+            yield answer
 
 
 # Create the chatbot interface
