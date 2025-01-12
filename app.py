@@ -101,14 +101,25 @@ def response(message, history):
             yield sentence.strip() + "."
             time.sleep(1.0)  # Add delay for typing effect
     else:
-        # Use query engine for standard responses
-        streaming_response = query_engine.query(message)
+        # Add the new message to history
+        history.append({"role": "user", "content": message})
+
+        # Construct the context by joining past messages in history
+        # Use last 5 messages as context
+        context = "\n".join([entry['content'] for entry in history[-5:]])
+
+        # Use query engine for standard responses, passing the constructed context
+        streaming_response = query_engine.query(
+            f"Context: {context}\nUser: {message}")
 
         answer = ""
         for text in streaming_response.response_gen:
             time.sleep(0.1)  # Add delay for each chunk
             answer += text
             yield answer
+
+        # Add the assistant's response to history
+        history.append({"role": "assistant", "content": answer})
 
 
 # Create the chatbot interface
