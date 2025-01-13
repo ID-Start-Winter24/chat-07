@@ -47,13 +47,13 @@ query_engine = index.as_query_engine(
     streaming=True, text_qa_template=qa_template
 )
 
-with open("assets/screenshots/ui/stylemate-header.jpg", "rb") as header_file:
+with open("assets/screenshots/ui/stylemate-header.png", "rb") as header_file:
     encoded_string = base64.b64encode(header_file.read()).decode()
 
-with open("assets/screenshots/ui/nav-bar.jpg", "rb") as nav_file:
+with open("assets/screenshots/ui/nav-bar.png", "rb") as nav_file:
     encoded_string2 = base64.b64encode(nav_file.read()).decode()
 
-with open("assets/screenshots/ui/banner.jpg", "rb") as banner_file:
+with open("assets/screenshots/ui/banner.png", "rb") as banner_file:
     encoded_string3 = base64.b64encode(banner_file.read()).decode()
 
 
