@@ -146,12 +146,12 @@
 
 @media screen and (max-width: 375px) {
   #CHATBOT {
-    width: 70%;
-    font-size: 10px;
+    width: 85%;
+    font-size: 8px;
   }
 
   .chatbot-input textarea {
-    font-size: 12px;
+    font-size: 8px;
   }
 
   /* Hide the header, nav, and banner images */

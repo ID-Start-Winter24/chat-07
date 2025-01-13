@@ -10,7 +10,5 @@ class CustomTheme(Base):
             # Light mode
             body_background_fill="#ffffff",
             # Dark mode
-            body_background_fill_dark="#ffffff",
             input_background_fill="#ffffff",  # Input background for light mode
-            input_background_fill_dark="#ffffff"  # Input background for dark mode
         )
