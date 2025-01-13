@@ -43,15 +43,15 @@
   width: 100%;
 }
 
-#component-6 {
+.chatbot-input {
   width: 500px;
-  background: rgba(255, 255, 255, 0.9);
+  background: rgba(255, 255, 255, 1); /* Transparenter Hintergrund */
   border: 1px solid #ddd;
   border-radius: 12px;
   padding: 10px;
   display: flex;
   align-items: center;
-  justify-content: space-between;
+  justify-content: space-between; /* Button rechts */
   box-sizing: border-box;
 }
 
@@ -89,19 +89,18 @@
 }
 
 /* Responsive Styles */
+/* Responsive Styles */
 @media screen and (max-width: 1024px) {
   #CHATBOT {
     width: 80%;
     font-size: 16px;
   }
 
-  .header-title {
-    font-size: 28px;
-  }
-
-  .image-container img {
-    width: 90%;
-    max-width: 100%;
+  /* Hide the header, nav, and banner images */
+  .stylemate-header,
+  .stylemate-nav,
+  .stylemate-banner {
+    display: none;
   }
 }
 
@@ -111,17 +110,15 @@
     font-size: 14px;
   }
 
-  .header-title {
-    font-size: 24px;
-  }
-
   .chatbot-input textarea {
     width: 100%;
   }
 
-  .image-container img {
-    width: 85%;
-    max-width: 100%;
+  /* Hide the header, nav, and banner images */
+  .stylemate-header,
+  .stylemate-nav,
+  .stylemate-banner {
+    display: none;
   }
 }
 
@@ -129,10 +126,6 @@
   #CHATBOT {
     width: 80%;
     font-size: 14px;
-  }
-
-  .header-title {
-    font-size: 20px;
   }
 
   .chatbot-input textarea {
@@ -143,28 +136,28 @@
     padding: 10px 0;
   }
 
-  .image-container img {
-    width: 80%;
-    max-width: 100%;
+  /* Hide the header, nav, and banner images */
+  .stylemate-header,
+  .stylemate-nav,
+  .stylemate-banner {
+    display: none;
   }
 }
 
 @media screen and (max-width: 375px) {
   #CHATBOT {
-    width: 50%;
+    width: 70%;
     font-size: 10px;
-  }
-
-  .header-title {
-    font-size: 18px;
   }
 
   .chatbot-input textarea {
     font-size: 12px;
   }
 
-  .image-container img {
-    width: 70%;
-    max-width: 100%;
+  /* Hide the header, nav, and banner images */
+  .stylemate-header,
+  .stylemate-nav,
+  .stylemate-banner {
+    display: none;
   }
 }
