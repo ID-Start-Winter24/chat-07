@@ -174,6 +174,24 @@ def main():
                 )
 
                 picture_analyzing = response.choices[0].message.content
+
+                response = client.chat.completions.create(
+                    model="gpt-4o-mini",
+                    messages=[
+                        {
+                            "role": "user",
+                            "content": [
+                                {
+                                    "type": "text",
+                                    "text": f"Auf einem Bild ist folgendes zu sehen: {picture_analyzing}. Was kann ich dazu tragen?",
+                                },
+                            ],
+                        }
+                    ],
+                )
+                
+                picture_analyzing = response.choices[0].message.content
+
                 # message += picture_analyzing
             for x in message.get("files", []):
                 history.append({"role": "user", "content": {"path": x}})
