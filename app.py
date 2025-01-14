@@ -1,11 +1,12 @@
 import os
-import time
 import gradio as gr
 from llama_index.core import VectorStoreIndex, SimpleDirectoryReader, StorageContext, load_index_from_storage, PromptTemplate
 from llama_index.llms.openai import OpenAI
 from llama_index.core import Settings
 from langdetect import detect
+import openai
 import base64
+import time
 
 from theme import CustomTheme
 
@@ -37,6 +38,7 @@ template = (
     "---------------------\n"
     "Given only this information and without using general knowledge, please answer in the appropriate language (German or English) based on the query: {query_str}\n"
     "Ensure your response is concise, reflects warmth, confidence, and a friendly demeanor. End each response by encouraging further conversation with a relevant, engaging question to keep the dialogue going.\n"
+    "Do not greet the user in every message!"
     "Additionally, remember your personality traits: 100% extroverted, 80% emotional, 20% rational, "
     "inspiring, self-assured, open-minded, trendy, and fully dedicated to sustainability in fashion.\n"
 )
@@ -56,44 +58,80 @@ with open("assets/screenshots/ui/nav-bar.png", "rb") as nav_file:
 with open("assets/screenshots/ui/banner.png", "rb") as banner_file:
     encoded_string3 = base64.b64encode(banner_file.read()).decode()
 
-
-# Custom CSS for chatbot interface
-custom_css = f"""
-.gradio-container {{
-    background: #ffffff !important;
-  background-size: cover;
-  font-family: "Merriweather", serif; /* Serifen-Schriftart wie auf der Elle-Webseite */
-  height: 100vh; /* Vollbildhöhe */
-  display: flex;
-  flex-direction: column; /* Vertikales Layout */
-  justify-content: flex-start; /* Startet den Inhalt oben */
-  align-items: center; /* Zentrierung horizontal */
-  color: #333; /* Schwarzer Text */
-  margin: 0; /* Kein zusätzlicher Rand */
-  padding: 20px 0; /* Abstand oben und unten */
-  box-sizing: border-box; /* Um Padding und Border korrekt zu berücksichtigen */
-  overflow: hidden; /* Verhindert unerwünschtes Scrollen */
-}}
+# Define the openai client which is used to describe the image
+client = openai.OpenAI()
+# image description list
+image_description = []
 
 
-#CHATBOT {{
-    flex-grow: 0; /* Prevent excessive resizing */
-    margin: auto; /* Center within the flex container */
-}}
-"""
-
-# Define the response function
+# Function to encode the image
+def encode_image(path):
+    with open(path, "rb") as image_file:
+        return base64.b64encode(image_file.read()).decode("utf-8")
 
 
-def response(message, history):
-    import random
-    import time
+# returns the image description from the openai gpt-4o-mini based on the given path
+def get_image_description(path):
+    base64_image = encode_image(path)
+
+    image_response = client.chat.completions.create(
+        model="gpt-4o-mini",
+        messages=[
+            {
+                "role": "user",
+                "content": [
+                    {
+                        "type": "text",
+                        "text": "What is in this image?",
+                    },
+                    {
+                        "type": "image_url",
+                        "image_url": {"url": f"data:image/jpeg;base64,{base64_image}"},
+                    },
+                ],
+            }
+        ],
+        max_tokens=150,
+    )
+    image_response = image_response.choices[0].message.content
+    print(image_response)
+
+    return image_response
+
+
+def user_input_function(message, history):
+    global image_description
+    for x in message["files"]:
+        history.append({"role": "user", "content": {"path": x}})
+        image_description.append(get_image_description(x))
+    if message["text"] is not None:
+        history.append({"role": "user", "content": message["text"]})
+
+    user_input = gr.MultimodalTextbox(
+        value=None,
+        show_label=False,
+        elem_id="USER_INPUT",
+        placeholder="Type your message here...",
+        interactive=True,
+        submit_btn=True
+    )
+
+    return user_input, history
+
+
+def response_function(history):
+    global image_description
+
+    message = history[-1]["content"]
+
+    if image_description:
+        message += "\nTake the following descriptions into account when answering:\n"
+        for description in image_description:
+            message += description
 
     # Detect language
-    try:
-        language = detect(message)  # Detects 'en' or 'de'
-    except:
-        language = 'de'  # Default to German if detection fails
+    language = 'en' if detect(
+        message) == 'en' else 'de'  # Detects 'en' or 'de'
 
     # Respond to dissatisfaction
     negative_outfit_phrases = ["hässlich", "ugly", "schlecht",
@@ -101,39 +139,40 @@ def response(message, history):
 
     if any(phrase in message.lower() for phrase in negative_outfit_phrases):
         responses = {
-            "en": [
-                "I'm sorry you're feeling this way. Let's see how we can improve your outfit – maybe with accessories or a fresh styling twist! 😊",
-                "Fashion is about how you feel in it – not just the clothing itself. I'm sure we can find something that makes you shine! 💖",
-                "Small details can make a big difference. Maybe we can enhance your outfit with a belt, a jacket, or some jewelry? Shall I help you? 🌟",
-            ],
-            "de": [
-                "Es tut mir leid, dass du dich gerade so fühlst. Lass uns zusammen schauen, wie wir dein Outfit aufwerten können – vielleicht mit Accessoires oder einem neuen Styling-Twist! 😊",
-                "Mode ist, wie du dich darin fühlst – nicht nur das Kleidungsstück selbst. Ich bin sicher, wir finden etwas, das dich zum Strahlen bringt! 💖",
-                "Manchmal machen kleine Details einen großen Unterschied. Vielleicht können wir dein Outfit mit einem Gürtel, einer Jacke oder Schmuck aufpeppen? Soll ich dir helfen? 🌟",
-            ]
+            "en": "**StyleMate:**\nI'm sorry you're feeling this way. Let's see how we can improve your outfit – maybe with accessories or a fresh styling twist! 😊\nFashion is about how you feel in it – not just the clothing itself. I'm sure we can find something that makes you shine! 💖\nSmall details can make a big difference. Maybe we can enhance your outfit with a belt, a jacket, or some jewelry? Shall I help you? 🌟",
+            "de": "**StyleMate:**\nEs tut mir leid, dass du dich gerade so fühlst. Lass uns zusammen schauen, wie wir dein Outfit aufwerten können – vielleicht mit Accessoires oder einem neuen Styling-Twist! 😊\nMode ist, wie du dich darin fühlst – nicht nur das Kleidungsstück selbst. Ich bin sicher, wir finden etwas, das dich zum Strahlen bringt! 💖\nManchmal machen kleine Details einen großen Unterschied. Vielleicht können wir dein Outfit mit einem Gürtel, einer Jacke oder Schmuck aufpeppen? Soll ich dir helfen? 🌟",
         }
-        for sentence in random.choice(responses[language]).split(". "):
-            yield sentence.strip() + "."
-            time.sleep(1.0)
-    else:
-        history.append({"role": "user", "content": message})
 
+        history.append({"role": "assistant", "content": ""})
+        print(len(responses[language]))
+
+        print(responses[language])
+        for idx in range(0, len(responses[language]), 3):
+            tokens = responses[language][idx:idx+3]
+            history[-1]["content"] += tokens
+            yield history
+            time.sleep(0.1)
+    else:
         # Use the query engine
-        context = "\n".join([entry['content'] for entry in history[-5:]])
+        for entry in history[-5:]:
+            print(entry)
+        context = "\n".join([entry['content'] if type(
+            entry['content']) == str else entry['content'][0] for entry in history[-5:]])
+        history.append({"role": "assistant", "content": "**StyleMate:**\n"})
         streaming_response = query_engine.query(
             f"Context: {context}\nUser: {message}")
 
-        answer = "**StyleMate:**\n"
         for text in streaming_response.response_gen:
+            history[-1]["content"] += text
             time.sleep(0.1)
-            answer += text
-            yield answer
+            yield history
 
-        history.append({"role": "assistant", "content": answer})
+    image_description = []
 
 
 # Create the chatbot interface
 theme = CustomTheme()
+
 
 design_html = f"""
 <div style="display: flex; flex-direction: column; justify-content: center; align-items: center; background-color: #ffffff; margin: 0; padding: 0; padding-bottom: 2vw; width:100%; height:auto;">
@@ -159,6 +198,7 @@ design_html = f"""
 def main():
     with gr.Blocks(css_paths="./styles.css") as stylemate_app:
         gr.HTML(design_html)
+
         chatbot = gr.Chatbot(
             value=[{"role": "assistant",
                     "content": ("**StyleMate:**\n"
@@ -171,16 +211,18 @@ def main():
             elem_id="CHATBOT"  # No avatars used
         )
 
-        chatinterface = gr.ChatInterface(
-            fn=response,
-            chatbot=chatbot,
-            type="messages",
-            theme=theme,
-            # css=custom_css,
-
+        user_input = gr.MultimodalTextbox(
+            show_label=False,
+            elem_id="USER_INPUT",
+            placeholder="Type your message here...",
+            interactive=True,
+            submit_btn=True
         )
 
-    stylemate_app.launch(inbrowser=True)
+        user_input.submit(user_input_function, inputs=[user_input, chatbot], outputs=[
+                          user_input, chatbot]).then(response_function, inputs=[chatbot], outputs=[chatbot])
+
+    stylemate_app.launch(inbrowser=True, show_api=False)
 
 
 if __name__ == "__main__":
