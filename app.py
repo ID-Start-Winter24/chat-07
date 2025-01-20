@@ -184,11 +184,11 @@ design_html = f"""
         <hr style="margin-top: 0; margin-bottom: 30px;" />
 
         <!-- Navigation bar and banner image with centered styling -->
-        <div class="image-container" style="text-align: center; padding: 0px 0 0 0; margin: 0;">
+        <div class="image-container" style="text-align: center; padding: 0px 0 0 0; margin-bottom: 0;">
             <img src="data:image/png;base64,{encoded_string2}" alt="stylemate-nav" width="35%" style="margin-bottom: 0;" aria-label="StyleMate navigation bar image"/>
         </div>
         <div style="width: 100%; display: flex; justify-content: center; padding: 30px 0 0px 0; margin: 0;">
-            <img src="data:image/png;base64,{encoded_string3}" alt="stylemate-banner" width="30%" style="margin-left: -400px;" aria-label="StyleMate banner image" />
+            <img src="data:image/png;base64,{encoded_string3}" alt="stylemate-banner" width="35%" style="margin-left: -280px;" aria-label="StyleMate banner image" />
         </div>
     </div>
 </div>
