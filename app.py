@@ -64,7 +64,7 @@ client = openai.OpenAI()
 image_description = []
 
 
-# Function to encode the image
+# Function to encode the image into Base 64 format
 def encode_image(path):
     with open(path, "rb") as image_file:
         return base64.b64encode(image_file.read()).decode("utf-8")
@@ -72,8 +72,10 @@ def encode_image(path):
 
 # returns the image description from the openai gpt-4o-mini based on the given path
 def get_image_description(path):
+    # Encode the image into Base64 format
     base64_image = encode_image(path)
 
+    # Send the encoded image to OpenAI's GPT-4 model with a descriptive prompt
     image_response = client.chat.completions.create(
         model="gpt-4o-mini",
         messages=[
@@ -91,22 +93,33 @@ def get_image_description(path):
                 ],
             }
         ],
-        max_tokens=150,
+        max_tokens=150,  # Limit the length of the model's response
     )
+    # Extract the gnerated description from the response
     image_response = image_response.choices[0].message.content
+    # Print the description for debugging or logs
     print(image_response)
 
     return image_response
 
+# Function to process user input, including text and uploaded images
+
 
 def user_input_function(message, history):
+    # Use the global list to store image descriptions
     global image_description
+    # Iterate over the uploaded files (image paths)
     for x in message["files"]:
+        # Add the image path to the conversation history
         history.append({"role": "user", "content": {"path": x}})
+        # Analyze the image and store its description
         image_description.append(get_image_description(x))
+
+    # If there's a text message, add it to the history
     if message["text"] is not None:
         history.append({"role": "user", "content": message["text"]})
 
+    # Return the updated user input and conversation history
     user_input = gr.MultimodalTextbox(
         value=None,
         show_label=False,
@@ -118,13 +131,19 @@ def user_input_function(message, history):
 
     return user_input, history
 
+# Function to generate the chatbot's response
+
 
 def response_function(history):
+    # Access the global ist of image descriptions
     global image_description
 
+    # Get the user's latest message from the history
     message = history[-1]["content"]
 
+    # If there are image descriptions, include them in the response context
     if image_description:
+        # Add the descriptions to the user's message
         message += "\nTake the following descriptions into account when answering:\n"
         for description in image_description:
             message += description
@@ -143,6 +162,7 @@ def response_function(history):
             "de": "**StyleMate:**\nEs tut mir leid, dass du dich gerade so fühlst. Lass uns zusammen schauen, wie wir dein Outfit aufwerten können – vielleicht mit Accessoires oder einem neuen Styling-Twist! 😊\nMode ist, wie du dich darin fühlst – nicht nur das Kleidungsstück selbst. Ich bin sicher, wir finden etwas, das dich zum Strahlen bringt! 💖\nManchmal machen kleine Details einen großen Unterschied. Vielleicht können wir dein Outfit mit einem Gürtel, einer Jacke oder Schmuck aufpeppen? Soll ich dir helfen? 🌟",
         }
 
+        # Append the response to the history and stream it in chuncks
         history.append({"role": "assistant", "content": ""})
         print(len(responses[language]))
 
@@ -152,21 +172,25 @@ def response_function(history):
             history[-1]["content"] += tokens
             yield history
             time.sleep(0.1)
+
     else:
-        # Use the query engine
+        # # If no negative sentiment, use the query engine to generate a response
         for entry in history[-5:]:
             print(entry)
         context = "\n".join([entry['content'] if type(
             entry['content']) == str else entry['content'][0] for entry in history[-5:]])
+
         history.append({"role": "assistant", "content": "**StyleMate:**\n"})
         streaming_response = query_engine.query(
             f"Context: {context}\nUser: {message}")
 
+        # Stream the generated response
         for text in streaming_response.response_gen:
             history[-1]["content"] += text
             time.sleep(0.1)
             yield history
 
+    # Clear the image descriptions after responding
     image_description = []
 
 
