@@ -16,14 +16,13 @@
 
 #CHATBOT {
   width: 750px;
-  max-height: 20%;
   background: #ffffff;
   border-radius: 20px;
   box-shadow: 0 6px 30px #aaa;
   border: 1px solid #ffffff4d;
 }
 
-.svelte-633qhp {
+#USER_INPUT {
   width: 750px !important;
   background: #ffffff !important;
   border-radius: 20px !important;
