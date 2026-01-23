@@ -4,11 +4,15 @@ from llama_index.core import VectorStoreIndex, SimpleDirectoryReader, StorageCon
 from llama_index.llms.openai import OpenAI
 from llama_index.core import Settings
 from langdetect import detect
+from dotenv import load_dotenv
 import openai
 import base64
 import time
 
 from theme import CustomTheme
+
+# Load environment variables from .env file
+load_dotenv()
 
 # Define paths for documents and persistence
 path_modulhandbuch = "./dokumente"
@@ -218,10 +222,51 @@ design_html = f"""
 </div>
 """
 
+custom_css = """
+<style>
+    #USER_INPUT,
+    #USER_INPUT *,
+    #USER_INPUT .form,
+    #USER_INPUT [class*="form"],
+    #USER_INPUT .svelte-1vd8eap,
+    #USER_INPUT [class*="svelte"],
+    div.form.svelte-1vd8eap {
+        background: transparent !important;
+        border: none !important;
+        box-shadow: none !important;
+    }
+    
+    #USER_INPUT * {
+        border-radius: 0 !important;
+    }
+    
+    #USER_INPUT {
+        background: #ffffff !important;
+        box-shadow: 0 6px 30px #aaa !important;
+        border-radius: 20px !important;
+        border: none !important;
+        overflow: hidden !important;
+    }
+    
+    #USER_INPUT *:focus,
+    #USER_INPUT *:hover {
+        outline: none !important;
+        border: none !important;
+        box-shadow: none !important;
+    }
+
+    #CHATBOT {
+        margin-top: -75px !important;
+    }
+
+</style>
+"""
+
 
 def main():
-    with gr.Blocks(css_paths="./styles.css") as stylemate_app:
+    with gr.Blocks(css_paths="./styles.css", theme=theme) as stylemate_app:
         gr.HTML(design_html)
+        gr.HTML(custom_css)  # ← เพิ่มบรรทัดนี้
 
         chatbot = gr.Chatbot(
             value=[{"role": "assistant",
@@ -232,7 +277,7 @@ def main():
                                 )}],
             type="messages",
             show_label=False,
-            elem_id="CHATBOT"  # No avatars used
+            elem_id="CHATBOT"
         )
 
         user_input = gr.MultimodalTextbox(

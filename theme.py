@@ -7,8 +7,10 @@ class CustomTheme(Base):
 
         # Customize the theme properties
         super().set(
-            # Light mode
             body_background_fill="#ffffff",
-            # Dark mode
-            input_background_fill="#ffffff",  # Input background for light mode
+            input_background_fill="#ffffff",
+            input_border_color="transparent",
+            input_border_width="0px",
+            input_shadow="none",
+            input_shadow_focus="none",
         )

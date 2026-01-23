@@ -29,11 +29,54 @@
   box-shadow: 0 6px 30px #aaa !important;
   overflow: hidden !important;
   backdrop-filter: blur(10px) !important;
-  border: 1px solid #ffffff4d !important;
+  border: none !important;
   box-sizing: border-box !important;
   margin-left: auto !important;
   margin-right: auto !important;
   font-size: 18px !important;
+  padding: 0 !important;
+}
+
+/* ลบ background สีเทา */
+#USER_INPUT .form,
+#USER_INPUT .svelte-1vd8eap,
+#USER_INPUT div[class*="form"],
+#USER_INPUT > * {
+  background: transparent !important;
+  border: none !important;
+  box-shadow: none !important;
+}
+
+#USER_INPUT textarea,
+#USER_INPUT input {
+  border: none !important;
+  outline: none !important;
+  box-shadow: none !important;
+  background: transparent !important;
+}
+
+#USER_INPUT textarea:focus,
+#USER_INPUT input:focus {
+  border: none !important;
+  outline: none !important;
+  box-shadow: none !important;
+}
+
+#USER_INPUT .svelte-5gfv2q,
+#USER_INPUT .full-container,
+#USER_INPUT .input-container,
+#USER_INPUT [class*="svelte"] {
+  border: none !important;
+  box-shadow: none !important;
+  background: transparent !important;
+}
+
+#USER_INPUT .wrap,
+#USER_INPUT .container,
+#USER_INPUT [class*="textbox"] {
+  border: none !important;
+  box-shadow: none !important;
+  background: transparent !important;
 }
 
 .header-title {
